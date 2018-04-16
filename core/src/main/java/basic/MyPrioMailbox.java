@@ -1,4 +1,4 @@
-package sample;
+package basic;
 
 import akka.actor.ActorSystem;
 import akka.actor.PoisonPill;
@@ -14,9 +14,8 @@ public class MyPrioMailbox extends UnboundedStablePriorityMailbox {
             public int gen(Object msg) {
                 if (msg.equals(PoisonPill.getInstance())) {
                     return 3; // PoisonPill when no other left
-                }
-                else {
-                    String message = (String)msg;
+                } else {
+                    String message = (String) msg;
                     if (message.startsWith("highpriority"))
                         return 0; // 'highpriority messages should be treated first if possible
                     else if (message.startsWith("lowpriority"))

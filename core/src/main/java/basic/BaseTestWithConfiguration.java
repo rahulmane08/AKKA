@@ -1,7 +1,8 @@
+package basic;
+
 import akka.testkit.TestKit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import sample.ConfigurationActorSystem;
 import scala.concurrent.duration.Duration;
 
 import java.util.concurrent.TimeUnit;

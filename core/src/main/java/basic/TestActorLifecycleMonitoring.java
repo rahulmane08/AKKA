@@ -1,3 +1,5 @@
+package basic;
+
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -5,7 +7,6 @@ import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.junit.Test;
-import sample.DeathWatcherActor;
 
 import java.io.IOException;
 

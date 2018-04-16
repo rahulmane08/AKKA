@@ -1,3 +1,5 @@
+package basic;
+
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.Kill;
@@ -7,7 +9,6 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.pattern.Patterns;
 import org.junit.Test;
-import sample.DeathWatcherActor;
 import scala.concurrent.duration.Duration;
 
 import java.util.concurrent.TimeUnit;

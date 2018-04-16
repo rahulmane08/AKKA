@@ -1,3 +1,5 @@
+package basic;
+
 import akka.actor.AbstractActor;
 import akka.actor.ActorPath;
 import akka.actor.ActorRef;

@@ -1,4 +1,4 @@
-package sample;
+package basic;
 
 import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
