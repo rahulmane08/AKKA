@@ -123,7 +123,7 @@ public class TestingActorSystemTest extends BaseTest {
     @Test
     public void testActorSystemSynchronously() throws Exception {
         Device.TemperatureRecorded testResult = ask(Device.props("group", "device"),
-                new Device.RecordTemperature(1L, 24.0), 3000);
+                new Device.RecordTemperature(1L, 24.0), 3);
         assertEquals(1L, testResult.requestId);
     }
 }

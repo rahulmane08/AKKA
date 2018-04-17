@@ -17,7 +17,7 @@ public class TestAskPattern extends BaseTest {
             String result = null;
             try {
                 result = ask(Props.create(DelayedActor.class, () -> new DelayedActor()),
-                        "hi", 20 * 1000);
+                        "hi", 2);
                 assertTrue(result.contains("hello"));
             } catch (Exception e) {
                 e.printStackTrace();

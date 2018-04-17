@@ -7,6 +7,7 @@ import akka.actor.Props;
 import akka.pattern.Patterns;
 import akka.testkit.TestActorRef;
 import akka.testkit.TestKit;
+import akka.util.Timeout;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import scala.Function0;
@@ -56,12 +57,13 @@ public class BaseTest {
         });
     }
 
-    protected <T extends AbstractActor, M, E> E ask(Props props, M message, long askTimeoutMillis)
+    protected <T extends AbstractActor, M, E> E ask(Props props, M message, int timeoutInSeconds)
             throws Exception {
+        Timeout timeout = new Timeout(Duration.create(5, "seconds"));
         TestActorRef<T> testActorRef = TestActorRef.create(system, props, "test-actor");
-        Future<Object> askResult = Patterns.ask(testActorRef, message, askTimeoutMillis);
+        Future<Object> askResult = Patterns.ask(testActorRef, message, timeout);
         assertTrue(askResult.isCompleted());
-        Object result = Await.result(askResult, Duration.Zero());
+        Object result = Await.result(askResult, timeout.duration());
         return (E) result;
     }
 }
