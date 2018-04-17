@@ -34,19 +34,19 @@ public class TestActorStashingBehaviour extends BaseTest{
     public void testStashMode() {
         FiniteDuration probeWait = Duration.apply(10, TimeUnit.SECONDS);
         FiniteDuration interval = Duration.apply(2, TimeUnit.SECONDS);
-        probe.within(probeWait, () -> {
+        executeTest(probeWait, () -> {
             ActorRef stashingActor = system.actorOf(
                     Props.create(StashingActor.class, () -> new StashingActor()), "stashing-actor");
-            probe.expectNoMessage(interval);
+            testKitProbe.expectNoMessage(interval);
             stashingActor.tell("hello", probingActor); // normal mode
             for (int i=0; i<10; i++)
                 stashingActor.tell("stashMessage", probingActor); //messages landing into stash
             stashingActor.tell("startStashMode", probingActor); // enable stash-mode
             stashingActor.tell("read", probingActor); // unstash the messages
-            probe.expectNoMessage(interval);
+            testKitProbe.expectNoMessage(interval);
             stashingActor.tell("endStashMode", probingActor); // end stash mode
             stashingActor.tell("bye bye", probingActor); // normal mode
-            probe.expectNoMessage();
+            testKitProbe.expectNoMessage();
             return true;
         });
     }

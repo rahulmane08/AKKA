@@ -2,6 +2,7 @@ package basic;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.AllForOneStrategy;
 import akka.actor.OneForOneStrategy;
 import akka.actor.Props;
@@ -11,16 +12,32 @@ import akka.event.LoggingAdapter;
 import akka.japi.pf.DeciderBuilder;
 import org.junit.Test;
 import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.concurrent.TimeUnit;
 
 public class TestSupervisionStrategy extends BaseTest {
     @Test
     public void testSupervisionStrategy() {
-        probe.within(Duration.apply(30, TimeUnit.SECONDS), () -> {
-            ActorRef supervisor = system.actorOf(Props.create(Supervisor.class));
-
-            return null;
+        executeTest(Duration.apply(30, TimeUnit.SECONDS), () -> {
+            FiniteDuration interval = Duration.apply(2, TimeUnit.SECONDS);
+            ActorRef supervisor = system.actorOf(Props.create(Supervisor.class, () -> new Supervisor()));
+            hold(interval);
+            ActorSelection child1 = system.actorSelection(supervisor.path().child("child1"));
+            ActorSelection child2 = system.actorSelection(supervisor.path().child("child2"));
+            ActorSelection child3 = system.actorSelection(supervisor.path().child("child3"));
+            supervisor.tell("child1", probingActor);
+            hold(interval);
+            child1.tell("hello", probingActor);
+            hold(interval);
+            supervisor.tell("child2", probingActor);
+            hold(Duration.apply(5, TimeUnit.SECONDS));
+            child2.tell("hello", probingActor);
+            hold(interval);
+            supervisor.tell("child3", probingActor);
+            hold(interval);
+            child3.tell("hello", probingActor);
+            return true;
         });
     }
 
@@ -115,9 +132,9 @@ public class TestSupervisionStrategy extends BaseTest {
         @Override
         public void preStart() throws Exception {
             log.info("starting supervisor");
-            child1 = getContext().actorOf(Props.create(Child1.class), "child1");
-            child2 = getContext().actorOf(Props.create(Child2.class), "child2");
-            child3 = getContext().actorOf(Props.create(Child3.class), "child3");
+            child1 = getContext().actorOf(Props.create(Child1.class, () -> new Child1()), "child1");
+            child2 = getContext().actorOf(Props.create(Child2.class, () -> new Child2()), "child2");
+            child3 = getContext().actorOf(Props.create(Child3.class, () -> new Child3()), "child3");
             super.preStart();
         }
 

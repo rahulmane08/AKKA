@@ -14,14 +14,14 @@ import java.util.concurrent.TimeUnit;
 public class TestActorSelection extends BaseTest {
     @Test
     public void testActorSelection() {
-        probe.within(Duration.apply(10, TimeUnit.SECONDS), () -> {
+        executeTest(Duration.apply(10, TimeUnit.SECONDS), () -> {
             final ActorRef parent = system.actorOf(
                     Props.create(ParentActor.class, () -> new ParentActor()), "parent");
             ActorPath parentPath = parent.path();
             system.actorSelection(parentPath.child("child1")).tell("hi", ActorRef.noSender());
             system.actorSelection(parentPath.child("child1")).tell("greet_brothers", ActorRef.noSender());
             system.actorSelection(parentPath.child("child1")).tell("hi", ActorRef.noSender());
-            probe.expectNoMsg();
+            testKitProbe.expectNoMsg();
             return null;
         });
     }

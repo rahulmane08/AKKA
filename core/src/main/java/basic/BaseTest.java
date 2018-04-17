@@ -9,9 +9,11 @@ import akka.testkit.TestActorRef;
 import akka.testkit.TestKit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import scala.Function0;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,12 +21,12 @@ import static org.junit.Assert.assertTrue;
 
 public class BaseTest {
     protected static ActorSystem system;
-    protected final TestKit probe;
+    protected final TestKit testKitProbe;
     protected final ActorRef probingActor;
 
     public BaseTest() {
-        probe = new TestKit(system);
-        probingActor = probe.testActor();
+        testKitProbe = new TestKit(system);
+        probingActor = testKitProbe.testActor();
     }
 
     @BeforeClass
@@ -36,6 +38,22 @@ public class BaseTest {
     public static void cleanup() {
         TestKit.shutdownActorSystem(system, Duration.apply(10, TimeUnit.SECONDS), true);
         system = null;
+    }
+
+    protected void hold(FiniteDuration duration) {
+        testKitProbe.expectNoMessage(duration);
+    }
+
+    protected void hold() {
+        testKitProbe.expectNoMessage();
+    }
+
+    protected <T> void executeTest(FiniteDuration deadline, Function0<T> test) {
+        testKitProbe.within(deadline, () -> {
+            T retVal = test.apply();
+            hold();
+            return retVal;
+        });
     }
 
     protected <T extends AbstractActor, M, E> E ask(Props props, M message, long askTimeoutMillis)

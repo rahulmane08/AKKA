@@ -7,8 +7,11 @@ import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import org.junit.Test;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 public class TestActorLifecycleMonitoring extends BaseTest {
     public static void main(String[] args) throws InterruptedException {
@@ -29,16 +32,20 @@ public class TestActorLifecycleMonitoring extends BaseTest {
     }
 
     @Test
-    public void testMonitorActorsLifecycle() throws InterruptedException {
-        ActorRef watchee = system.actorOf(Props.create(WatchedActor.class, () -> new WatchedActor()), "watchee");
-        ActorRef deathWatcherActor = system.actorOf(
-                Props.create(DeathWatcherActor.class, () -> new DeathWatcherActor(watchee)), "death-watcher");
-        deathWatcherActor.tell(watchee, probingActor);
-        Thread.sleep(5 * 1000);
-        watchee.tell("hello", ActorRef.noSender());
-        Thread.sleep(10000);
-        watchee.tell("bye", ActorRef.noSender());
-        Thread.sleep(10000);
+    public void testMonitorActorsLifecycle() {
+        executeTest(scala.concurrent.duration.Duration.apply(10, TimeUnit.SECONDS), () -> {
+            FiniteDuration interval = scala.concurrent.duration.Duration.apply(2, TimeUnit.SECONDS);
+            ActorRef watchee = system.actorOf(Props.create(WatchedActor.class, () -> new WatchedActor()), "watchee");
+            ActorRef deathWatcherActor = system.actorOf(
+                    Props.create(DeathWatcherActor.class, () -> new DeathWatcherActor(watchee)), "death-watcher");
+            deathWatcherActor.tell(watchee, probingActor);
+            hold(interval);
+            watchee.tell("hello", ActorRef.noSender());
+            hold(interval);
+            watchee.tell("bye", ActorRef.noSender());
+            hold(interval);
+            return true;
+        });
     }
 
     private class WatchedActor extends AbstractActor {

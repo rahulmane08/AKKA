@@ -49,17 +49,20 @@ public class TestBecomeUnbecome extends BaseTest {
     }
 
     @Test
-    public void testHotSwapOfBehaviour() throws InterruptedException {
+    public void testHotSwapOfBehaviour() {
         FiniteDuration probeWait = Duration.apply(5, TimeUnit.SECONDS);
-        ActorRef hotswapActor = system.actorOf(
-                Props.create(HotSwapActor.class, () -> new HotSwapActor()), "hot-swap-actor");
-        Thread.sleep(2000);
-        hotswapActor.tell("foo", probingActor); // actor becomes angry
-        hotswapActor.tell("foo", probingActor); // actor remains angry
-        system.log().info(probe.expectMsgClass(probeWait, String.class));
-        hotswapActor.tell("bar", probingActor); // actor becomes angry
-        hotswapActor.tell("bar", probingActor); // actor remains angry
-        system.log().info(probe.expectMsgClass(probeWait, String.class));
-        Thread.sleep(2000);
+
+        executeTest(probeWait, () -> {
+            ActorRef hotswapActor = system.actorOf(
+                    Props.create(HotSwapActor.class, () -> new HotSwapActor()), "hot-swap-actor");
+            hold(Duration.apply(2, TimeUnit.SECONDS));
+            hotswapActor.tell("foo", probingActor); // actor becomes angry
+            hotswapActor.tell("foo", probingActor); // actor remains angry
+            system.log().info(testKitProbe.expectMsgClass(probeWait, String.class));
+            hotswapActor.tell("bar", probingActor); // actor becomes angry
+            hotswapActor.tell("bar", probingActor); // actor remains angry
+            system.log().info(testKitProbe.expectMsgClass(probeWait, String.class));
+            return true;
+        });
     }
 }

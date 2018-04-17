@@ -13,7 +13,7 @@ public class TestPriorityMailbox extends BaseTestWithConfiguration {
 
     @Test
     public void testPrioMailbox() {
-        probe.within(Duration.apply(1, TimeUnit.MINUTES), () -> {
+        executeTest(Duration.apply(1, TimeUnit.MINUTES), () -> {
             ActorRef testActor = system.actorOf(Props.create(AbstractActor.class, () -> new AbstractActor() {
                 @Override
                 public Receive createReceive() {
@@ -37,8 +37,7 @@ public class TestPriorityMailbox extends BaseTestWithConfiguration {
             for (int i = 0; i < 5; i++) {
                 testActor.tell("highpriority" + i, ActorRef.noSender());
             }
-            probe.expectNoMessage();
-            return null;
+            return true;
         });
 
     }

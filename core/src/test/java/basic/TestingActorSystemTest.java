@@ -98,25 +98,25 @@ public class TestingActorSystemTest extends BaseTest {
         ActorRef deviceActor = system.actorOf(Device.props("group", "device"),
                 "device-actor-A");
 
-        probe.within(probeWait, () -> {
+        executeTest(probeWait, () -> {
             deviceActor.tell(new Device.RecordTemperature(1L, 24.0), probingActor);
-            assertEquals(1L, probe.expectMsgClass(probeWait, Device.TemperatureRecorded.class).requestId);
+            assertEquals(1L, testKitProbe.expectMsgClass(probeWait, Device.TemperatureRecorded.class).requestId);
 
             deviceActor.tell(new Device.ReadTemperature(2L), probingActor);
-            Device.RespondTemperature response1 = probe.expectMsgClass(probeWait, Device.RespondTemperature.class);
+            Device.RespondTemperature response1 = testKitProbe.expectMsgClass(probeWait, Device.RespondTemperature.class);
             assertEquals(2L, response1.requestId);
             assertEquals(Optional.of(24.0), response1.value);
 
             deviceActor.tell(new Device.RecordTemperature(3L, 55.0), probingActor);
-            assertEquals(3L, probe.expectMsgClass(probeWait, Device.TemperatureRecorded.class).requestId);
+            assertEquals(3L, testKitProbe.expectMsgClass(probeWait, Device.TemperatureRecorded.class).requestId);
 
             deviceActor.tell(new Device.ReadTemperature(4L), probingActor);
-            Device.RespondTemperature response2 = probe.expectMsgClass(probeWait, Device.RespondTemperature.class);
+            Device.RespondTemperature response2 = testKitProbe.expectMsgClass(probeWait, Device.RespondTemperature.class);
             assertEquals(4L, response2.requestId);
             assertEquals(Optional.of(55.0), response2.value);
 
-            probe.expectNoMessage();
-            return null;
+            testKitProbe.expectNoMessage();
+            return true;
         });
     }
 
