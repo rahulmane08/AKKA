@@ -20,10 +20,10 @@ public class TestActorStoppingMechanisms extends BaseTest {
     public void testActorStopping() throws InterruptedException {
         FiniteDuration interval = Duration.apply(2, TimeUnit.SECONDS);
         executeTest(Duration.apply(20, TimeUnit.SECONDS), () -> {
-            ActorRef actor1 = system.actorOf(Props.create(TestActor.class, () -> new TestActor()), "actor1");
-            ActorRef actor2 = system.actorOf(Props.create(TestActor.class, () -> new TestActor()), "actor2");
-            ActorRef actor3 = system.actorOf(Props.create(TestActor.class, () -> new TestActor()), "actor3");
-            ActorRef actor4 = system.actorOf(Props.create(TestActor.class, () -> new TestActor()), "actor4");
+            ActorRef actor1 = system.actorOf(Props.create(TestActor.class, TestActor::new), "actor1");
+            ActorRef actor2 = system.actorOf(Props.create(TestActor.class, TestActor::new), "actor2");
+            ActorRef actor3 = system.actorOf(Props.create(TestActor.class, TestActor::new), "actor3");
+            ActorRef actor4 = system.actorOf(Props.create(TestActor.class, TestActor::new), "actor4");
             ActorRef deatchWatcher = system.actorOf(
                     Props.create(DeathWatcherActor.class, () -> new DeathWatcherActor(actor1, actor2, actor3, actor4)),
                     "death-watcher");
@@ -40,11 +40,8 @@ public class TestActorStoppingMechanisms extends BaseTest {
                 system.log().info("actor4 stopped: " + val.get());
                 return val.get();
             }, system.dispatcher());
-            hold();
             return true;
         });
-
-
 
 
         Thread.sleep(6 * 1000);

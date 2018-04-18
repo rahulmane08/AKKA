@@ -1,5 +1,5 @@
 package basic;
 
-public class TestControlAwareMailbox extends BaseTestWithConfiguration{
+public class TestControlAwareMailbox extends BaseTestWithConfiguration {
 
 }

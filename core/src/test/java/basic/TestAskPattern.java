@@ -13,11 +13,11 @@ public class TestAskPattern extends BaseTest {
 
     @Test
     public void testAskPattern() throws Exception {
-        executeTest(Duration.apply(20,TimeUnit.SECONDS), () -> {
+        executeTest(Duration.apply(20, TimeUnit.SECONDS), () -> {
             String result = null;
             try {
-                result = ask(Props.create(DelayedActor.class, () -> new DelayedActor()),
-                        "hi", 2);
+                result = ask(Props.create(DelayedActor.class, DelayedActor::new),
+                        "hi", 15, "delayed-actor");
                 assertTrue(result.contains("hello"));
             } catch (Exception e) {
                 e.printStackTrace();

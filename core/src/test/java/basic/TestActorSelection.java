@@ -16,7 +16,7 @@ public class TestActorSelection extends BaseTest {
     public void testActorSelection() {
         executeTest(Duration.apply(10, TimeUnit.SECONDS), () -> {
             final ActorRef parent = system.actorOf(
-                    Props.create(ParentActor.class, () -> new ParentActor()), "parent");
+                    Props.create(ParentActor.class, ParentActor::new), "parent");
             ActorPath parentPath = parent.path();
             system.actorSelection(parentPath.child("child1")).tell("hi", ActorRef.noSender());
             system.actorSelection(parentPath.child("child1")).tell("greet_brothers", ActorRef.noSender());

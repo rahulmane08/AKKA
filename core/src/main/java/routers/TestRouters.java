@@ -33,11 +33,11 @@ public class TestRouters extends BaseTest {
                 .withHashMapper(msg -> msg.hashCode())
                 .props(Props.create(Routee.class, () -> new Routee())), "consistent-hash-router");
 
-        for (int i=0; i<5; i++) {
-            for (int j=0; j<5; j++){
-                String message = "message"+j;
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                String message = "message" + j;
                 consistentHashRouter.tell(message, probingActor);
-                Thread.sleep(2*1000);
+                Thread.sleep(2 * 1000);
             }
         }
     }
@@ -47,7 +47,7 @@ public class TestRouters extends BaseTest {
         ActorRef smallestMailboxPoolRouter = BaseTest.system.actorOf(new SmallestMailboxPool(5)
                 .props(Props.create(Routee.class, () -> new Routee())), "smallest-mb-pool-router");
         // load routee $a with 1000 messages
-        for (int i=0; i<10000; i++) {
+        for (int i = 0; i < 10000; i++) {
             system.actorSelection(smallestMailboxPoolRouter.path().child("$a")).tell("burstmessage", probingActor);
         }
         // this router will not choose $a and send the actual messages only to $b as its the next actor with smallest mb
@@ -59,7 +59,7 @@ public class TestRouters extends BaseTest {
         ActorRef balancingPool = BaseTest.system.actorOf(new BalancingPool(5)
                 .props(Props.create(Routee.class, () -> new Routee())), "balancing-pool-router");
         // load routee $a with 1000 messages
-        for (int i=0; i<10000; i++) {
+        for (int i = 0; i < 10000; i++) {
             system.actorSelection(balancingPool.path().child("$a")).tell("burstmessage", probingActor);
         }
         // this router will not choose $a and send the actual messages only to $b as its the next actor with smallest mb

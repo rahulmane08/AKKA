@@ -57,10 +57,10 @@ public class BaseTest {
         });
     }
 
-    protected <T extends AbstractActor, M, E> E ask(Props props, M message, int timeoutInSeconds)
+    protected <T extends AbstractActor, M, E> E ask(Props props, M message, int timeoutInSeconds, String actorName)
             throws Exception {
-        Timeout timeout = new Timeout(Duration.create(5, "seconds"));
-        TestActorRef<T> testActorRef = TestActorRef.create(system, props, "test-actor");
+        Timeout timeout = new Timeout(Duration.create(timeoutInSeconds, "seconds"));
+        TestActorRef<T> testActorRef = TestActorRef.create(system, props, actorName);
         Future<Object> askResult = Patterns.ask(testActorRef, message, timeout);
         assertTrue(askResult.isCompleted());
         Object result = Await.result(askResult, timeout.duration());

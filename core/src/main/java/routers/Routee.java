@@ -3,7 +3,6 @@ package routers;
 import akka.actor.AbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import akka.routing.ConsistentHashingRouter;
 
 class Routee extends AbstractActor {
     private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);

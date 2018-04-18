@@ -5,14 +5,12 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.time.Duration;
-
-public class TimeActor extends AbstractActorWithTimers {
-    private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+public class TimerActor extends AbstractActorWithTimers {
     private final String TICK_KEY = "TickKey";
     private final FiniteDuration repeatDuration;
+    private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
-    public TimeActor(FiniteDuration repeatDuration) {
+    public TimerActor(FiniteDuration repeatDuration) {
         this.repeatDuration = repeatDuration;
     }
 

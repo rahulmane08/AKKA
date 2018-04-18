@@ -10,6 +10,23 @@ import scala.concurrent.duration.FiniteDuration;
 import java.util.concurrent.TimeUnit;
 
 public class TestBecomeUnbecome extends BaseTest {
+    @Test
+    public void testHotSwapOfBehaviour() {
+        FiniteDuration probeWait = Duration.apply(5, TimeUnit.SECONDS);
+        executeTest(probeWait, () -> {
+            ActorRef hotswapActor = system.actorOf(
+                    Props.create(HotSwapActor.class, HotSwapActor::new), "hot-swap-actor");
+            hold(Duration.apply(2, TimeUnit.SECONDS));
+            hotswapActor.tell("foo", probingActor); // actor becomes angry
+            hotswapActor.tell("foo", probingActor); // actor remains angry
+            system.log().info(testKitProbe.expectMsgClass(probeWait, String.class));
+            hotswapActor.tell("bar", probingActor); // actor becomes angry
+            hotswapActor.tell("bar", probingActor); // actor remains angry
+            system.log().info(testKitProbe.expectMsgClass(probeWait, String.class));
+            return true;
+        });
+    }
+
     class HotSwapActor extends AbstractActor {
         private AbstractActor.Receive angry;
         private AbstractActor.Receive happy;
@@ -46,23 +63,5 @@ public class TestBecomeUnbecome extends BaseTest {
                     )
                     .build();
         }
-    }
-
-    @Test
-    public void testHotSwapOfBehaviour() {
-        FiniteDuration probeWait = Duration.apply(5, TimeUnit.SECONDS);
-
-        executeTest(probeWait, () -> {
-            ActorRef hotswapActor = system.actorOf(
-                    Props.create(HotSwapActor.class, () -> new HotSwapActor()), "hot-swap-actor");
-            hold(Duration.apply(2, TimeUnit.SECONDS));
-            hotswapActor.tell("foo", probingActor); // actor becomes angry
-            hotswapActor.tell("foo", probingActor); // actor remains angry
-            system.log().info(testKitProbe.expectMsgClass(probeWait, String.class));
-            hotswapActor.tell("bar", probingActor); // actor becomes angry
-            hotswapActor.tell("bar", probingActor); // actor remains angry
-            system.log().info(testKitProbe.expectMsgClass(probeWait, String.class));
-            return true;
-        });
     }
 }

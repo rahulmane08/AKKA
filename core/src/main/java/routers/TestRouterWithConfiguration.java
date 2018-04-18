@@ -2,7 +2,6 @@ package routers;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
-import akka.routing.ConsistentHashingRouter;
 import akka.routing.FromConfig;
 import basic.BaseTestWithConfiguration;
 import org.junit.Test;
@@ -35,7 +34,7 @@ public class TestRouterWithConfiguration extends BaseTestWithConfiguration {
         ActorRef smallestMailboxPoolRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
                 "smallest-mb-router");
         // load routee $a with 1000 messages
-        for (int i=0; i<10000; i++) {
+        for (int i = 0; i < 10000; i++) {
             system.actorSelection(smallestMailboxPoolRouter.path().child("$a")).tell("burstmessage", probingActor);
         }
         // this router will not choose $a and send the actual messages only to $b as its the next actor with smallest mb
@@ -47,7 +46,7 @@ public class TestRouterWithConfiguration extends BaseTestWithConfiguration {
         ActorRef balancingPoolRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
                 "balancing-pool-router");
         // load routee $a with 1000 messages
-        for (int i=0; i<10000; i++) {
+        for (int i = 0; i < 10000; i++) {
             system.actorSelection(balancingPoolRouter.path().child("$a")).tell("burstmessage", probingActor);
         }
         // this router will not choose $a and send the actual messages only to $b as its the next actor with smallest mb
@@ -58,11 +57,11 @@ public class TestRouterWithConfiguration extends BaseTestWithConfiguration {
     public void testConsistentHashingRouter() throws InterruptedException {
         ActorRef consistentHashRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
                 "consistent-hash-router");
-        for (int i=0; i<5; i++) {
-            for (int j=0; j<5; j++){
-                String message = "message"+j;
-                consistentHashRouter.tell(new HashableMessage<>(message) , probingActor);
-                Thread.sleep(2*1000);
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                String message = "message" + j;
+                consistentHashRouter.tell(new HashableMessage<>(message), probingActor);
+                Thread.sleep(2 * 1000);
             }
         }
     }

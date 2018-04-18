@@ -21,7 +21,7 @@ public class TestSupervisionStrategy extends BaseTest {
     public void testSupervisionStrategy() {
         executeTest(Duration.apply(30, TimeUnit.SECONDS), () -> {
             FiniteDuration interval = Duration.apply(2, TimeUnit.SECONDS);
-            ActorRef supervisor = system.actorOf(Props.create(Supervisor.class, () -> new Supervisor()));
+            ActorRef supervisor = system.actorOf(Props.create(Supervisor.class, Supervisor::new));
             hold(interval);
             ActorSelection child1 = system.actorSelection(supervisor.path().child("child1"));
             ActorSelection child2 = system.actorSelection(supervisor.path().child("child2"));
@@ -132,9 +132,9 @@ public class TestSupervisionStrategy extends BaseTest {
         @Override
         public void preStart() throws Exception {
             log.info("starting supervisor");
-            child1 = getContext().actorOf(Props.create(Child1.class, () -> new Child1()), "child1");
-            child2 = getContext().actorOf(Props.create(Child2.class, () -> new Child2()), "child2");
-            child3 = getContext().actorOf(Props.create(Child3.class, () -> new Child3()), "child3");
+            child1 = getContext().actorOf(Props.create(Child1.class, Child1::new), "child1");
+            child2 = getContext().actorOf(Props.create(Child2.class, Child2::new), "child2");
+            child3 = getContext().actorOf(Props.create(Child3.class, Child3::new), "child3");
             super.preStart();
         }
 
