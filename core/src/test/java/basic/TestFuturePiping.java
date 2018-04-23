@@ -19,17 +19,20 @@ public class TestFuturePiping extends BaseTest {
     @Test
     public void testPiping() {
         executeTest(Duration.apply(20, TimeUnit.SECONDS), () -> {
+            Double x = new Double(2);
             Timeout askTimeout = new Timeout(Duration.apply(15, TimeUnit.SECONDS));
             ActorRef squarer = system.actorOf(Props.create(Squarer.class, Squarer::new), "squarer");
             ActorRef cuber = system.actorOf(Props.create(Cuber.class, Cuber::new), "cuber");
             ActorRef printer = system.actorOf(Props.create(Printer.class, Printer::new), "printer");
             hold(Duration.apply(2, TimeUnit.SECONDS));
-            Future<Double> square = Patterns.ask(squarer, new Double(2), askTimeout)
+            Future<Double> square = Patterns.ask(squarer, x, askTimeout)
                     .map(result -> (Double) result, system.dispatcher());
-            Future<Double> cube = Patterns.ask(cuber, new Double(2), askTimeout)
+            Future<Double> cube = Patterns.ask(cuber, x, askTimeout)
                     .map(result -> (Double) result, system.dispatcher());
-            Patterns.pipe(square, system.dispatcher()).to(printer, probingActor);
-            Patterns.pipe(cube, system.dispatcher()).to(printer, probingActor);
+            Patterns.pipe(square.map(s -> String.format("Square of %1$,.2f = %2$,.2f",x,s), system.dispatcher()),
+                    system.dispatcher()).to(printer, probingActor);
+            Patterns.pipe(cube.map(c -> String.format("Cube of %1$,.2f = %2$,.2f",x,c), system.dispatcher()),
+                    system.dispatcher()).to(printer, probingActor);
 
             Future<Iterable<Double>> comboFuture = Futures.sequence(Arrays.asList(square, cube), system.dispatcher());
             Future<Double> summed = comboFuture.map(list -> {
@@ -39,7 +42,8 @@ public class TestFuturePiping extends BaseTest {
                 system.log().info("summed future = " + sum);
                 return sum;
             }, system.dispatcher());
-            Patterns.pipe(summed, system.dispatcher()).to(printer, probingActor);
+            Patterns.pipe(summed.map(s -> String.format("Sum of square and cube of %1$,.2f = %2$,.2f",x,s), system.dispatcher()),
+                    system.dispatcher()).to(printer, probingActor);
             return true;
         });
     }
@@ -80,8 +84,7 @@ public class TestFuturePiping extends BaseTest {
         @Override
         public Receive createReceive() {
             return receiveBuilder()
-                    .match(Double.class, result -> log.info("Printing result = " + result))
-                    .matchAny(msg -> log.info("unknown message: " + msg))
+                    .matchAny(msg -> log.info(String.valueOf(msg)))
                     .build();
         }
     }
