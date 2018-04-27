@@ -5,52 +5,71 @@ import akka.actor.Props;
 import akka.routing.FromConfig;
 import basic.BaseTestWithConfiguration;
 import org.junit.Test;
+import scala.concurrent.duration.Duration;
+
+import java.util.concurrent.TimeUnit;
 
 public class TestRouterWithConfiguration extends BaseTestWithConfiguration {
 
     @Test
     public void testRoundRobinRouter() throws InterruptedException {
-        ActorRef roundRobinRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
-                "round-robin-router");
-        sendMessage(roundRobinRouter);
+        executeTest(Duration.apply(20, TimeUnit.SECONDS), () -> {
+            ActorRef roundRobinRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
+                    "round-robin-router");
+            sendMessage(roundRobinRouter);
+            return true;
+        });
     }
 
     @Test
     public void testRandomRouter() throws InterruptedException {
-        ActorRef randomRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
-                "random-router");
-        sendMessage(randomRouter);
+        executeTest(Duration.apply(20, TimeUnit.SECONDS), () -> {
+            ActorRef randomRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
+                    "random-router");
+            sendMessage(randomRouter);
+            return true;
+        });
     }
 
     @Test
     public void testBroadCastRouter() throws InterruptedException {
-        ActorRef broadcastRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
-                "broadcast-router");
-        sendMessage(broadcastRouter);
+        executeTest(Duration.apply(20, TimeUnit.SECONDS), () -> {
+            ActorRef broadcastRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
+                    "broadcast-router");
+            sendMessage(broadcastRouter);
+            return true;
+        });
     }
 
     @Test
     public void testSmallestMailboxPoolRouter() throws InterruptedException {
-        ActorRef smallestMailboxPoolRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
-                "smallest-mb-router");
-        // load routee $a with 1000 messages
-        for (int i = 0; i < 10000; i++) {
-            system.actorSelection(smallestMailboxPoolRouter.path().child("$a")).tell("burstmessage", probingActor);
-        }
-        // this router will not choose $a and send the actual messages only to $b as its the next actor with smallest mb
-        sendMessage(smallestMailboxPoolRouter);
+        executeTest(Duration.apply(20, TimeUnit.SECONDS), () -> {
+            ActorRef smallestMailboxPoolRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
+                    "smallest-mb-router");
+            // load routee $a with 1000 messages
+            for (int i = 0; i < 10000; i++) {
+                system.actorSelection(smallestMailboxPoolRouter.path().child("$a")).tell("burstmessage", probingActor);
+            }
+            // this router will not choose $a and send the actual messages only to $b as its the next actor with smallest mb
+            sendMessage(smallestMailboxPoolRouter);
+            return true;
+        });
     }
 
     @Test
     public void testBalancingPoolRouter() throws InterruptedException {
-        ActorRef balancingPoolRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
-                "balancing-pool-router");
-        // load routee $a with 1000 messages
-        for (int i = 0; i < 10000; i++) {
-            system.actorSelection(balancingPoolRouter.path().child("$a")).tell("burstmessage", probingActor);
-        }
-        // this router will not choose $a and send the actual messages only to $b as its the next actor with smallest mb
-        sendMessage(balancingPoolRouter);
+        executeTest(Duration.apply(20, TimeUnit.SECONDS), () -> {
+            ActorRef balancingPoolRouter = system.actorOf(FromConfig.getInstance().props(Props.create(Routee.class)),
+                    "balancing-pool-router");
+            hold(Duration.apply(2, TimeUnit.SECONDS));
+            // load routee $a with 1000 messages
+            for (int i = 0; i < 10000; i++) {
+                system.actorSelection(balancingPoolRouter.path().child("$a")).tell("burstmessage", probingActor);
+            }
+            // this router will not choose $a and send the actual messages only to $b as its the next actor with smallest mb
+            sendMessage(balancingPoolRouter);
+            return true;
+        });
     }
 
     @Test
@@ -66,10 +85,14 @@ public class TestRouterWithConfiguration extends BaseTestWithConfiguration {
         }
     }
 
-    private void sendMessage(ActorRef router) throws InterruptedException {
+    private void sendMessage(ActorRef router) {
         for (int i = 0; i < 10; i++) {
-            Thread.sleep(2 * 1000);
-            router.tell("message" + i, probingActor);
+            try {
+                Thread.sleep(2 * 1000);
+                router.tell("message" + i, probingActor);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

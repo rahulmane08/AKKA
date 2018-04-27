@@ -7,10 +7,10 @@ import scala.concurrent.duration.Duration;
 
 import java.util.concurrent.TimeUnit;
 
-public class BaseTestWithConfiguration extends BaseTest {
+public class BaseRemoteTestWithConfiguration extends BaseTest {
     @BeforeClass
     public static void start() {
-        system = ConfigurationActorSystem.newInstance("my-system");
+        system = ConfigurationActorSystem.newInstance("remote1-system");
     }
 
     @AfterClass

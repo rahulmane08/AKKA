@@ -20,7 +20,7 @@ public class TestPriorityMailbox extends BaseTestWithConfiguration {
                     return receiveBuilder()
                             .match(String.class, msg -> {
                                 Thread.sleep(2 * 1000);
-                                system.log().info(String.format("processing msg: %s", msg));
+                                system.log().info(String.format("%s processing msg: %s", getSelf().path(), msg));
                             })
                             .build();
                 }

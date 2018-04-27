@@ -8,6 +8,7 @@ public class SampleEventBus extends LookupEventBus<Message, ActorRef, String> {
     /**
      * determines the initial size of the index data structure
      * used internally (i.e. the expected number of different classifiers)
+     *
      * @return
      */
     @Override
@@ -18,6 +19,7 @@ public class SampleEventBus extends LookupEventBus<Message, ActorRef, String> {
     /**
      * must define a full order over the subscribers, expressed as expected from
      * `java.lang.Comparable.compare`
+     *
      * @param a
      * @param b
      * @return
@@ -38,6 +40,7 @@ public class SampleEventBus extends LookupEventBus<Message, ActorRef, String> {
     /**
      * will be invoked for each event for all subscribers which registered themselves
      * for the event’s classifier
+     *
      * @param event
      * @param subscriber
      */

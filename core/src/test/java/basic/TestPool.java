@@ -52,7 +52,7 @@ public class TestPool {
                 System.out.println("main cancelling the future");
                 submit.cancel(true);
             }
-            logStats(workerPool);
+        logStats(workerPool);
     }
 
     private static void logStats(ScheduledExecutorService workerPool) {

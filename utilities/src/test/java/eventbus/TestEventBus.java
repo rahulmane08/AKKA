@@ -3,7 +3,6 @@ package eventbus;
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
-import akka.event.EventBus;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import basic.BaseTest;
@@ -13,22 +12,6 @@ import scala.concurrent.duration.Duration;
 import java.util.concurrent.TimeUnit;
 
 public class TestEventBus extends BaseTest {
-
-    class Subscriber extends AbstractActor {
-        private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
-
-        public Subscriber(String topic, SampleEventBus eventBus) {
-           //eventBus.subscribe(this, topic);
-        }
-
-        @Override
-        public Receive createReceive() {
-            return receiveBuilder()
-                    .match(Message.class, msg -> log.info(String.format("%s received the message [%s] from bus")
-                            , getSelf().path().name(), msg.payload))
-                    .build();
-        }
-    }
 
     @Test
     public void testEventBus() {
@@ -45,5 +28,21 @@ public class TestEventBus extends BaseTest {
 
             return true;
         });
+    }
+
+    class Subscriber extends AbstractActor {
+        private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+
+        public Subscriber(String topic, SampleEventBus eventBus) {
+            //eventBus.subscribe(this, topic);
+        }
+
+        @Override
+        public Receive createReceive() {
+            return receiveBuilder()
+                    .match(Message.class, msg -> log.info(String.format("%s received the message [%s] from bus")
+                            , getSelf().path().name(), msg.payload))
+                    .build();
+        }
     }
 }

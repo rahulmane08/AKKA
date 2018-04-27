@@ -6,7 +6,6 @@ import akka.actor.Cancellable;
 import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import basic.BaseTest;
 import org.junit.Test;
 import scala.concurrent.duration.Duration;
 
@@ -14,18 +13,6 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class TestAkkaScheduler extends BaseTest {
-
-    class Ticker extends AbstractActor {
-        private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
-        @Override
-        public Receive createReceive() {
-            return receiveBuilder()
-                    .matchEquals("Tick", m -> {
-                        log.info("Ticker received tick at "+new Date());
-                    })
-                    .build();
-        }
-    }
 
     @Test
     public void testScheduler() {
@@ -40,5 +27,18 @@ public class TestAkkaScheduler extends BaseTest {
             system.log().info("cancelled the scheduled ticks");
             return true;
         });
+    }
+
+    class Ticker extends AbstractActor {
+        private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+
+        @Override
+        public Receive createReceive() {
+            return receiveBuilder()
+                    .matchEquals("Tick", m -> {
+                        log.info("Ticker received tick at " + new Date());
+                    })
+                    .build();
+        }
     }
 }

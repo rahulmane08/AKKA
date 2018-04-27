@@ -29,9 +29,9 @@ public class TestFuturePiping extends BaseTest {
                     .map(result -> (Double) result, system.dispatcher());
             Future<Double> cube = Patterns.ask(cuber, x, askTimeout)
                     .map(result -> (Double) result, system.dispatcher());
-            Patterns.pipe(square.map(s -> String.format("Square of %1$,.2f = %2$,.2f",x,s), system.dispatcher()),
+            Patterns.pipe(square.map(s -> String.format("Square of %1$,.2f = %2$,.2f", x, s), system.dispatcher()),
                     system.dispatcher()).to(printer, probingActor);
-            Patterns.pipe(cube.map(c -> String.format("Cube of %1$,.2f = %2$,.2f",x,c), system.dispatcher()),
+            Patterns.pipe(cube.map(c -> String.format("Cube of %1$,.2f = %2$,.2f", x, c), system.dispatcher()),
                     system.dispatcher()).to(printer, probingActor);
 
             Future<Iterable<Double>> comboFuture = Futures.sequence(Arrays.asList(square, cube), system.dispatcher());
@@ -42,7 +42,7 @@ public class TestFuturePiping extends BaseTest {
                 system.log().info("summed future = " + sum);
                 return sum;
             }, system.dispatcher());
-            Patterns.pipe(summed.map(s -> String.format("Sum of square and cube of %1$,.2f = %2$,.2f",x,s), system.dispatcher()),
+            Patterns.pipe(summed.map(s -> String.format("Sum of square and cube of %1$,.2f = %2$,.2f", x, s), system.dispatcher()),
                     system.dispatcher()).to(printer, probingActor);
             return true;
         });
