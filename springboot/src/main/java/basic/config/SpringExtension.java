@@ -7,10 +7,13 @@ import akka.actor.Props;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-@Component("springExtension")
 public class SpringExtension extends AbstractExtensionId<SpringExtension.SpringExt> {
-    public static final SpringExtension SPRING_EXTENSION_PROVIDER
+    private static final SpringExtension SPRING_EXTENSION_PROVIDER
             = new SpringExtension();
+
+    public static SpringExtension getInstance() {
+        return SPRING_EXTENSION_PROVIDER;
+    }
 
     @Override
     public SpringExt createExtension(ExtendedActorSystem system) {
@@ -26,7 +29,7 @@ public class SpringExtension extends AbstractExtensionId<SpringExtension.SpringE
 
         public Props props(String actorBeanName) {
             return Props.create(
-                    SpringActorProducer.class, applicationContext, actorBeanName);
+                    SpringActorProducer.class, applicationContext, actorBeanName).withDispatcher("my-dispatcher");
         }
     }
 }
